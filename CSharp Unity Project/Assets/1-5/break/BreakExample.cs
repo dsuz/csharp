@@ -2,59 +2,59 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// break �̎g�p��Ƃ��āA�f���𔻒肷��B
+/// break の使用例として、素数を判定する。
 /// </summary>
 public class BreakExample : MonoBehaviour
 {
-    /// <summary>���ʂ�\������ UI</summary>
+    /// <summary>結果を表示する UI</summary>
     [SerializeField] Text _text;
 
     /// <summary>
-    /// �f���𔻒肷��B�O������Ăяo���Ďg���B
+    /// 素数を判定する。外部から呼び出して使う。
     /// </summary>
-    /// <param name="inputField">������������Ƃ��ē����Ă��� UI</param>
+    /// <param name="inputField">数字が文字列として入っている UI</param>
     public void IsPrime(InputField inputField)
     {
-        // ���͂��������񂪐����ɕϊ��ł��邩�`�F�b�N����
+        // 入力した文字列が整数に変換できるかチェックする
         if (int.TryParse(inputField.text, out _))
         {
-            // �����ɕϊ��ł���ꍇ
+            // 整数に変換できる場合
             int n = int.Parse(inputField.text);
-            // �f���𔻒肷��B
+            // 素数を判定する。
             IsPrime(n);
         }
         else
         {
-            // ���͂��ꂽ�����񂪐����Ƃ��ĕs���������ꍇ
-            _text.text = "int �͈̔͂� ��������͂��ĉ�����";
+            // 入力された文字列が整数として不正だった場合
+            _text.text = "int の範囲で 整数を入力して下さい";
         }
     }
 
     /// <summary>
-    /// �f���𔻒肵�Č��ʂ�\������B
-    /// �P���ȁu�G���g�X�e�l�X�̂ӂ邢�v���g���đf���𔻒肵�Ă���B
-    /// �^����ꂽ���� 2 �����̏ꍇ�͍l�����Ă��Ȃ��̂Œ��ӂ��邱�ƁB
+    /// 素数を判定して結果を表示する。
+    /// 単純な「エラトステネスのふるい」を使って素数を判定している。
+    /// 与えられた数が 2 未満の場合は考慮していないので注意すること。
     /// </summary>
-    /// <param name="number">�f�����ǂ������肷��l</param>
+    /// <param name="number">素数かどうか判定する値</param>
     void IsPrime(int number)
     {
-        bool isPrime = true; // �f���ł���Ɖ��肵�ď������n�߂�
+        bool isPrime = true; // 素数であると仮定して処理を始める
 
-        // 2, 3, 4, 5, ... �ŏ��ԂɊ���Z�����Ă���
+        // 2, 3, 4, 5, ... で順番に割り算をしていく
         for (int i = 2; i < number; i++)
         {
-            if (number % i == 0) // ����؂ꂽ��f���ł͂Ȃ�
+            if (number % i == 0) // 割り切れたら素数ではない
             {
-                _text.text = $"{number} �� {i} �Ŋ���؂�� �f���ł͂Ȃ�";
-                isPrime = false;    // �f���ł͂Ȃ������m�肵��
-                break;  // ����ȏ㏈�������Ă����ʂȂ̂Ń��[�v�𔲂���ibreak �̎g�p��j
+                _text.text = $"{number} は {i} で割り切れる 素数ではない";
+                isPrime = false;    // 素数ではない事が確定した
+                break;  // これ以上処理をしても無駄なのでループを抜ける（break の使用例）
             }
         }
 
-        // �f���������烁�b�Z�[�W��\������
+        // 素数だったらメッセージを表示する
         if (isPrime)
         {
-            _text.text = $"{number} �͑f���ł���";
+            _text.text = $"{number} は素数である";
         }
     }
 }

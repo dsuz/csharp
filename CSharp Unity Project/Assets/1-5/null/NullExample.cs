@@ -1,41 +1,41 @@
 using UnityEngine;
 
 /// <summary>
-/// null ‚Ìà–¾‚Æ‚µ‚ÄASprite ‚ÌF‚ğ•Ï‚¦‚éB
+/// null ã®èª¬æ˜ã¨ã—ã¦ã€Sprite ã®è‰²ã‚’å¤‰ãˆã‚‹ã€‚
 /// </summary>
 public class NullExample : MonoBehaviour
 {
-    /// <summary>•Ï‚¦‚éæ‚ÌF</summary>
+    /// <summary>å¤‰ãˆã‚‹å…ˆã®è‰²</summary>
     [SerializeField] Color _color = Color.red;
 
     /// <summary>
-    /// Sprite ‚ÌF‚ğ•Ï‚¦‚éBŠO•”‚©‚çŒÄ‚Ño‚µ‚Äg‚¤B
+    /// Sprite ã®è‰²ã‚’å¤‰ãˆã‚‹ã€‚å¤–éƒ¨ã‹ã‚‰å‘¼ã³å‡ºã—ã¦ä½¿ã†ã€‚
     /// </summary>
     public void ChangeColor()
     {
-        // SpriteRenderer ƒRƒ“ƒ|[ƒlƒ“ƒg‚ğæ“¾‚·‚éB’Ç‰Á‚³‚ê‚Ä‚È‚¢ê‡‚Í null ‚ª–ß‚³‚ê‚éB
+        // SpriteRenderer ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã‚’å–å¾—ã™ã‚‹ã€‚è¿½åŠ ã•ã‚Œã¦ãªã„å ´åˆã¯ null ãŒæˆ»ã•ã‚Œã‚‹ã€‚
         SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
         spriteRenderer.color = _color;
     }
 
     /// <summary>
-    /// Sprite ‚ÌF‚ğ•Ï‚¦‚éBŠO•”‚©‚çŒÄ‚Ño‚µ‚Äg‚¤B
-    /// ƒGƒ‰[‚É‚È‚ç‚È‚¢‚æ‚¤‚É null ƒ`ƒFƒbƒN‚ğ‚µ‚Ä‚¢‚éB
+    /// Sprite ã®è‰²ã‚’å¤‰ãˆã‚‹ã€‚å¤–éƒ¨ã‹ã‚‰å‘¼ã³å‡ºã—ã¦ä½¿ã†ã€‚
+    /// ã‚¨ãƒ©ãƒ¼ã«ãªã‚‰ãªã„ã‚ˆã†ã« null ãƒã‚§ãƒƒã‚¯ã‚’ã—ã¦ã„ã‚‹ã€‚
     /// </summary>
     public void ChangeColorWithNullCheck()
     {
         SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
 
-        // null ƒ`ƒFƒbƒN
-        if (spriteRenderer != null)
+        // null ãƒã‚§ãƒƒã‚¯
+        if (spriteRenderer != null) // å¤‰æ•°ãŒ Unity ã®ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã§ã‚ã‚‹å ´åˆã¯ if (spriteRenderer) ã¨æ›¸ã„ã¦ã‚‚ã‚ˆã„
         {
-            // null ‚¶‚á‚È‚¯‚ê‚ÎF‚ğ•Ï‚¦‚é
+            // null ã˜ã‚ƒãªã‘ã‚Œã°è‰²ã‚’å¤‰ãˆã‚‹
             spriteRenderer.color = _color;
         }
         else
         {
-            // null ‚¾‚Á‚½‚çƒCƒ“ƒXƒ^ƒ“ƒX‚ğ‘€ì‚¹‚¸AŒx‚ğo—Í‚·‚é
-            Debug.LogWarning($"{name} ‚É Sprite Renderer ƒRƒ“ƒ|[ƒlƒ“ƒg‚ª’Ç‰Á‚³‚ê‚Ä‚¢‚Ü‚¹‚ñ");
+            // null ã ã£ãŸã‚‰ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’æ“ä½œã›ãšã€è­¦å‘Šã‚’å‡ºåŠ›ã™ã‚‹
+            Debug.LogWarning($"{name} ã« Sprite Renderer ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆãŒè¿½åŠ ã•ã‚Œã¦ã„ã¾ã›ã‚“");
         }
     }
 }
