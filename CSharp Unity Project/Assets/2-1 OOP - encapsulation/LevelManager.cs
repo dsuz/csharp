@@ -6,10 +6,10 @@ using UnityEngine;
 /// </summary>
 public class LevelManager : MonoBehaviour
 {
-    /// <summary>レベルアップテーブルが CSV として格納されているテキスト</summary>
-    [SerializeField] TextAsset m_levelUpTable = default;
+    /// <summary>レベルアップテーブルが CSV 形式で格納されているテキスト</summary>
+    [SerializeField] TextAsset _levelUpTable = default;
     /// <summary>レベルアップテーブルが入っている Dictionary</summary>
-    Dictionary<int, PlayerStats> m_levelData = new Dictionary<int, PlayerStats>();
+    Dictionary<int, PlayerStats> _levelData = new Dictionary<int, PlayerStats>();
 
     /// <summary>
     /// Start より先に実行する
@@ -20,13 +20,13 @@ public class LevelManager : MonoBehaviour
     }
 
     /// <summary>
-    /// m_levelUpTable で指定されたテキストアセットから CSV データを読み取り、
+    /// _levelUpTable で指定されたテキストアセットから CSV データを読み取り、
     /// レベルアップテーブルを作る
     /// </summary>
     void BuildLevelUpTable()
     {
         // C# の標準ライブラリを使って「一行ずつ読む」という処理をする
-        System.IO.StringReader sr = new System.IO.StringReader(m_levelUpTable.text);
+        System.IO.StringReader sr = new System.IO.StringReader(_levelUpTable.text);
         // 一行目は列名なので飛ばす
         sr.ReadLine();
 
@@ -45,7 +45,7 @@ public class LevelManager : MonoBehaviour
             string[] values = line.Split(',');
             int level = int.Parse(values[0]);
             PlayerStats stats = new PlayerStats(level, int.Parse(values[1]), int.Parse(values[2]), int.Parse(values[3]), int.Parse(values[4]), int.Parse(values[5]));
-            m_levelData.Add(level, stats);
+            _levelData.Add(level, stats);
         }
 
         Debug.Log("Finished BuildLevelUpTable");
@@ -58,9 +58,9 @@ public class LevelManager : MonoBehaviour
     /// <returns></returns>
     public PlayerStats GetData(int level)
     {
-        if (m_levelData.ContainsKey(level))
+        if (_levelData.ContainsKey(level))
         {
-            return m_levelData[level];
+            return _levelData[level];
         }
 
         Debug.LogError($"指定されたレベルは存在しません。level: {level}");
