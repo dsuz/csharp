@@ -20,21 +20,23 @@ public class HumanControllerTopDown2D : MonoBehaviour
     [SerializeField] float _lifeReduceSpeedOnPoisoned = 1f;
     /// <summary>麻痺の時にどれくらい移動速度が落ちるか</summary>
     [SerializeField] float _speedReductionRatioOnParalyzed = 0.5f;
+    /// <summary>ライフをテキスト表示する</summary>
     [SerializeField] Text _lifeText;
+    /// <summary>ライフをゲージで表示する</summary>
+    [SerializeField] Slider _lifeGauge;
     Rigidbody2D _rb;
-    Animator _anim;
     SpriteRenderer _sprite;
     float _life = 0;
     bool _isPoisoned = false;
     bool _isParalyzed = false;
     bool _isDead = false;
+    /// <summary>プレイヤーの状態を表す</summary>
     PlayerState _state = PlayerState.Normal;
 
     void Start()
     {
         _life = _maxLife;
         _rb = GetComponent<Rigidbody2D>();
-        _anim = GetComponent<Animator>();
         _sprite = GetComponent<SpriteRenderer>();
     }
 
@@ -72,25 +74,16 @@ public class HumanControllerTopDown2D : MonoBehaviour
             _sprite.color = Color.red;
         }
 
-        // ライフ表示処理
+        // ライフ表示処理（テキスト）
         if (_lifeText)
         {
             _lifeText.text = _life.ToString("000");
         }
-    }
 
-    void LateUpdate()
-    {
-        if (_anim)
+        // ライフ表示処理（ゲージ）
+        if (_lifeGauge)
         {
-            if (_rb.velocity.magnitude > 0)
-            {
-                _anim.Play("Walk");
-            }
-            else
-            {
-                _anim.Play("Idle");
-            }
+            _lifeGauge.value = _life / _maxLife;
         }
     }
 
