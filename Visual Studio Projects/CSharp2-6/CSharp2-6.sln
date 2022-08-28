@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.1622
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "1 Lambda Expression Example", "1 Lambda Expression Example\1 Lambda Expression Example.csproj", "{209E2A12-EC8D-4759-8BA4-CEF79E06A91A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "2 Lambda Expression Exercise", "2 Lambda Expression Exercise\2 Lambda Expression Exercise.csproj", "{D0413D06-8E8E-46D4-94B3-29B3C8A2BE56}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{209E2A12-EC8D-4759-8BA4-CEF79E06A91A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{209E2A12-EC8D-4759-8BA4-CEF79E06A91A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{209E2A12-EC8D-4759-8BA4-CEF79E06A91A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{209E2A12-EC8D-4759-8BA4-CEF79E06A91A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0413D06-8E8E-46D4-94B3-29B3C8A2BE56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0413D06-8E8E-46D4-94B3-29B3C8A2BE56}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0413D06-8E8E-46D4-94B3-29B3C8A2BE56}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0413D06-8E8E-46D4-94B3-29B3C8A2BE56}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6DAE2EDA-F82B-4A64-B1C5-FFDD40074A14}
+	EndGlobalSection
+EndGlobal
