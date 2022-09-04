@@ -1,42 +1,42 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.EventSystems;
 using DG.Tweening;
 using UniRx;
 
 /// <summary>
-/// ’‚ÌƒLƒƒƒ‰ƒNƒ^[‚ğ“®‚©‚·‚½‚ß‚ÌƒRƒ“ƒ|[ƒlƒ“ƒg
+/// è™«ã®ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ã‚’å‹•ã‹ã™ãŸã‚ã®ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆ
 /// </summary>
 public class BugController : MonoBehaviour, IPointerClickHandler
 {
-    // DOTween ‚ÉŠÖ‚·‚éƒpƒ‰ƒ[ƒ^
-    [Tooltip("‰¡•ûŒü‚Ì“®‚«‚ğ§Œä‚·‚é"), SerializeField] float _endValueX = 8f;
-    [Tooltip("c•ûŒü‚Ì“®‚«‚ğ§Œä‚·‚é"), SerializeField] float _endValueY = 1f;
-    [Tooltip("‰¡•ûŒü‚Ì“®‚«‚Ìƒ‹[ƒvŠÔ"), SerializeField] float _timeX = 3f;
-    [Tooltip("c•ûŒü‚Ì“®‚«‚Ìƒ‹[ƒvŠÔ"), SerializeField] float _timeY = 1f;
-    // UniRx ‚ÉŠÖ‚·‚éƒpƒ‰ƒ[ƒ^/ƒvƒƒpƒeƒB
-    [Tooltip("‰Šúƒ‰ƒCƒt"), SerializeField] int _maxLife = 3;
+    // DOTween ã«é–¢ã™ã‚‹ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
+    [Tooltip("æ¨ªæ–¹å‘ã®å‹•ãã‚’åˆ¶å¾¡ã™ã‚‹"), SerializeField] float _endValueX = 8f;
+    [Tooltip("ç¸¦æ–¹å‘ã®å‹•ãã‚’åˆ¶å¾¡ã™ã‚‹"), SerializeField] float _endValueY = 1f;
+    [Tooltip("æ¨ªæ–¹å‘ã®å‹•ãã®ãƒ«ãƒ¼ãƒ—æ™‚é–“"), SerializeField] float _timeX = 3f;
+    [Tooltip("ç¸¦æ–¹å‘ã®å‹•ãã®ãƒ«ãƒ¼ãƒ—æ™‚é–“"), SerializeField] float _timeY = 1f;
+    // UniRx ã«é–¢ã™ã‚‹ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿/ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£
+    [Tooltip("åˆæœŸãƒ©ã‚¤ãƒ•"), SerializeField] int _maxLife = 3;
     private readonly ReactiveProperty<int> _life = new IntReactiveProperty();
 
     void Start()
     {
-        // DOTween ‚ğg‚Á‚Ä“®‚«‚ğì‚é
+        // DOTween ã‚’ä½¿ã£ã¦å‹•ãã‚’ä½œã‚‹
         transform.DOMoveX(_endValueX, _timeX).SetEase(Ease.Linear).SetLoops(-1, LoopType.Yoyo);
         transform.DOLocalMoveY(_endValueY, _timeY).SetEase(Ease.InOutQuad).SetLoops(-1, LoopType.Yoyo);
-        // UniRx ‚Ì€”õ
+        // UniRx ã®æº–å‚™
         _life.Value = _maxLife;
         _life.AddTo(this);
-        // ƒ‰ƒCƒt‚ªŒ¸‚Á‚½‚ÉÀs‚·‚éˆ—‚ğİ’è‚·‚é
-        this._life.Subscribe(_ => Debug.Log($"Œ‚‚½‚ê‚½! c‚èƒ‰ƒCƒt: {_life}"));  // ‰‰ñŒÄ‚Î‚ê‚é‚±‚Æ‚ğ”ğ‚¯‚½‚¢ê‡‚Í Skip ƒƒ\ƒbƒh‚ğŒÄ‚Ô
+        // ãƒ©ã‚¤ãƒ•ãŒæ¸›ã£ãŸæ™‚ã«å®Ÿè¡Œã™ã‚‹å‡¦ç†ã‚’è¨­å®šã™ã‚‹
+        this._life.Subscribe(_ => Debug.Log($"æ’ƒãŸã‚ŒãŸ! æ®‹ã‚Šãƒ©ã‚¤ãƒ•: {_life}"));  // åˆå›å‘¼ã°ã‚Œã‚‹ã“ã¨ã‚’é¿ã‘ãŸã„å ´åˆã¯ Skip ãƒ¡ã‚½ãƒƒãƒ‰ã‚’å‘¼ã¶
     }
 
     void OnDestroy()
     {
-        // DOTween ‚ğ~‚ß‚éi~‚ß‚È‚¢‚ÆŒx‚ªo‚éj
+        // DOTween ã‚’æ­¢ã‚ã‚‹ï¼ˆæ­¢ã‚ãªã„ã¨è­¦å‘ŠãŒå‡ºã‚‹ï¼‰
         DOTween.KillAll();
     }
 
     /// <summary>
-    /// ƒIƒuƒWƒFƒNƒg‚ğƒNƒŠƒbƒN‚µ‚½‚çƒ‰ƒCƒt‚ğŒ¸‚ç‚µAƒ‰ƒCƒt‚ª 0 ‚É‚È‚Á‚½‚ç”jŠü‚·‚é
+    /// ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ã‚¯ãƒªãƒƒã‚¯ã—ãŸã‚‰ãƒ©ã‚¤ãƒ•ã‚’æ¸›ã‚‰ã—ã€ãƒ©ã‚¤ãƒ•ãŒ 0 ã«ãªã£ãŸã‚‰ç ´æ£„ã™ã‚‹
     /// </summary>
     /// <param name="eventData"></param>
     void IPointerClickHandler.OnPointerClick(UnityEngine.EventSystems.PointerEventData eventData)

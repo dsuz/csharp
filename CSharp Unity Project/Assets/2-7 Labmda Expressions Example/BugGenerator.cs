@@ -1,9 +1,9 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// w’è‚µ‚½ƒvƒŒƒnƒu‚ğ1‘Ì‚¸‚Â¶¬‚µ‘±‚¯‚éƒRƒ“ƒ|[ƒlƒ“ƒg
+/// æŒ‡å®šã—ãŸãƒ—ãƒ¬ãƒãƒ–ã‚’1ä½“ãšã¤ç”Ÿæˆã—ç¶šã‘ã‚‹ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆ
 /// </summary>
 public class BugGenerator : MonoBehaviour
 {
