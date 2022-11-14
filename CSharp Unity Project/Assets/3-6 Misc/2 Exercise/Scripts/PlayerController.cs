@@ -13,7 +13,7 @@ public class PlayerController : MonoBehaviour
     /// <summary>ターンの速さ</summary>
     [SerializeField] float _turnSpeed = 3f;
     /// <summary>ジャンプ力</summary>
-    [SerializeField] float _jumpPower = 5f;
+    [SerializeField] float _jumpSpeed = 5f;
     /// <summary>接地判定の際、コライダーの中心 (Center) からどれくらいの距離を「接地している」と判定するかの長さ</summary>
     [SerializeField] float _isGroundedLength = 1.1f;
     /// <summary>地面を表す Layer</summary>
@@ -28,9 +28,11 @@ public class PlayerController : MonoBehaviour
     [SerializeField] AudioClip _jumpSfx = null;
 
     /// <summary>ジャンプした回数。接地状態からジャンプした時に 1 になる。</summary>
-    int _jumpCount = 0;
+    public int _jumpCount = 0;
     /// <summary>敵を検出するコンポーネント</summary>
     EnemyDetector _enemyDetector = null;
+    /// <summary>接地フラグ</summary>
+    bool _isGrounded = false;
     Rigidbody _rb = null;
     CapsuleCollider _collider = null;
     Animator _anim = null;
@@ -73,13 +75,16 @@ public class PlayerController : MonoBehaviour
         }
 
         // ジャンプの入力を取得し、接地している場合はジャンプする
-        if (Input.GetButtonDown("Jump") && IsGrounded())
+        if (Input.GetButtonDown("Jump"))
         {
-            Jump();
+            if (_isGrounded)
+            {
+                Jump();
+            }
         }
 
         // 接地している時のみ攻撃可能
-        if (Input.GetButtonDown("Fire1") && IsGrounded())
+        if (Input.GetButtonDown("Fire1") && _isGrounded)
         {
             Attack();
         }
@@ -91,7 +96,7 @@ public class PlayerController : MonoBehaviour
         Vector3 velocity = _rb.velocity;
         velocity.y = 0; // 上下方向の速度は無視する
         _anim.SetFloat("Speed", velocity.magnitude);
-        _anim.SetBool("IsGrounded", IsGrounded());
+        _anim.SetBool("IsGrounded", _isGrounded);
     }
 
     /// <summary>
@@ -100,7 +105,10 @@ public class PlayerController : MonoBehaviour
     void Jump()
     {
         AudioSource.PlayClipAtPoint(_jumpSfx, this.transform.position);
-        _rb.AddForce(Vector3.up * _jumpPower, ForceMode.Impulse);
+        // AddForce でなくスピードを変える（AddForce だと、降下中にジャンプした時にジャンプが弱くなる）
+        Vector3 velocity = _rb.velocity;
+        velocity.y = _jumpSpeed;
+        _rb.velocity = velocity;
     }
 
     /// <summary>
@@ -119,17 +127,15 @@ public class PlayerController : MonoBehaviour
         Instantiate(_bulletPrefab, _muzzle.position, _muzzle.rotation);
     }
 
-    /// <summary>
-    /// 地面に接触しているか判定する
-    /// </summary>
-    /// <returns></returns>
-    bool IsGrounded()
+    void OnTriggerEnter(Collider other)
     {
-        // Physics.Linecast() を使って足元から線を張り、そこに何かが衝突していたら true とする
-        Vector3 start = this.transform.position + _collider.center;   // start: コライダーの中心
-        Vector3 end = start + Vector3.down * _isGroundedLength;  // end: start から真下の地点
-        Debug.DrawLine(start, end); // 動作確認用に Scene ウィンドウ上で線を表示する
-        bool isGrounded = Physics.Linecast(start, end, _groundLayer); // 引いたラインに地面にぶつかっていたら true とする
-        return isGrounded;
+        _isGrounded = true;
+        _jumpCount = 0; // 着地した時にカウンタをリセットする
+    }
+
+    void OnTriggerExit(Collider other)
+    {
+        _isGrounded = false;
+        _anim.SetTrigger("JumpTrigger");    // ジャンプした時や足場から降りた時にモーションを再生する
     }
 }
