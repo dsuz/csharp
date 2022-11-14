@@ -34,13 +34,11 @@ public class PlayerController : MonoBehaviour
     /// <summary>接地フラグ</summary>
     bool _isGrounded = false;
     Rigidbody _rb = null;
-    CapsuleCollider _collider = null;
     Animator _anim = null;
 
     void Start()
     {
         _rb = GetComponent<Rigidbody>();
-        _collider = GetComponent<CapsuleCollider>();
         _anim = GetComponent<Animator>();
         _enemyDetector = GetComponent<EnemyDetector>();
     }
@@ -80,7 +78,13 @@ public class PlayerController : MonoBehaviour
             if (_isGrounded)
             {
                 Jump();
-            }
+            }   // 接地している時
+            else if (_jumpCount < _maxJumpCount)
+            {
+                _jumpCount++;
+                _anim.SetTrigger("JumpTrigger");
+                Jump();
+            }   // 接地しておらず、最大ジャンプ回数に達していない時
         }
 
         // 接地している時のみ攻撃可能
@@ -120,6 +124,10 @@ public class PlayerController : MonoBehaviour
         if (_enemyDetector.Target)
         {
             Debug.Log("ロックオンしている敵がいます");
+            // ロックオンしている敵の方を向く
+            Vector3 dir = _enemyDetector.Target.transform.position - transform.position;
+            dir.y = 0;  // 上や下を向かないように調整する
+            transform.forward = dir;
         }
 
         // 攻撃アニメーションを再生し、弾を発射する
@@ -136,6 +144,7 @@ public class PlayerController : MonoBehaviour
     void OnTriggerExit(Collider other)
     {
         _isGrounded = false;
+        _jumpCount = 1; // 初回ジャンプまたは足場から降りた時にカウンタを１にする
         _anim.SetTrigger("JumpTrigger");    // ジャンプした時や足場から降りた時にモーションを再生する
     }
 }

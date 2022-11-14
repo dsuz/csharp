@@ -36,11 +36,14 @@ public class TankController : MonoBehaviour
 
         // レイキャストして「レーザーポインターがどこに当たっているか」を調べる
         Ray ray = new Ray(_muzzle.position, this.transform.forward);   // muzzle から正面に ray を飛ばす
-        RaycastHit hit;
 
         // _rayCastHitPosition の初期値は「muzzle から前方に射程距離だけ伸ばした座標」とする
         _rayCastHitPosition = _muzzle.position + this.transform.forward * _maxFireDistance;
         // 課題: 以下で Physics.Raycast() を使って Ray が衝突する座標を取得し、レーザーが障害物に衝突した時はそこでレーザーが止まるように修正せよ
+        if (Physics.Raycast(ray, out RaycastHit hit, _maxFireDistance))
+        {
+            _rayCastHitPosition = hit.point;
+        }
 
         // Line Renderer を使ってレーザーを描く
         _line.SetPosition(0, _muzzle.position);
@@ -64,6 +67,6 @@ public class TankController : MonoBehaviour
     void Fire1()
     {
         // 課題: 以下のコードでは Muzzle の場所で爆発するが、「レーザーが障害物に衝突した位置」で爆発するように修正せよ
-        _explosionObject.Explode(_muzzle.position);
+        _explosionObject.Explode(_rayCastHitPosition);
     }
 }
