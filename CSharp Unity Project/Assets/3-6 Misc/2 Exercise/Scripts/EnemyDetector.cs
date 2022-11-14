@@ -2,7 +2,7 @@
 
 /// <summary>
 /// 敵を検出するコンポーネント。
-/// Target Range より近くにいる敵（タグに EnemyTag が設定されたオブジェクト）のうち、最も近くにいる敵をロックオンする。
+/// Target Range より近くにいる敵（タグに Enemy が設定されたオブジェクト）のうち、最も近くにいる敵をロックオンする。
 /// ロックオンしたオブジェクトは Target プロパティで取得できる。
 /// </summary>
 public class EnemyDetector : MonoBehaviour

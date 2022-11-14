@@ -38,7 +38,7 @@ public class TankController : MonoBehaviour
         Ray ray = new Ray(_muzzle.position, this.transform.forward);   // muzzle から正面に ray を飛ばす
         RaycastHit hit;
 
-        // m_rayCastHitPosition の初期値は「muzzle から前方に射程距離だけ伸ばした座標」とする
+        // _rayCastHitPosition の初期値は「muzzle から前方に射程距離だけ伸ばした座標」とする
         _rayCastHitPosition = _muzzle.position + this.transform.forward * _maxFireDistance;
         // 課題: 以下で Physics.Raycast() を使って Ray が衝突する座標を取得し、レーザーが障害物に衝突した時はそこでレーザーが止まるように修正せよ
 
@@ -52,7 +52,7 @@ public class TankController : MonoBehaviour
 
         if (h != 0)
         {
-            this.transform.Rotate(Vector3.up, h * _rotateSpeed * Time.deltaTime * v >= 0 ? 1 : -1);
+            this.transform.Rotate(Vector3.up, h * _rotateSpeed * Time.deltaTime * (v >= 0 ? 1 : -1));
         }
 
         if (v != 0)

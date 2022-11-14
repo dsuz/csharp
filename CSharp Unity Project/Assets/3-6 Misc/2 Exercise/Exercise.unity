@@ -643,7 +643,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -927199367670048503, guid: 320b1c2af77554f99a1658df4a6d3d5c, type: 3}
       propertyPath: m_Name
-      value: Robot Kyle
+      value: Player
       objectReference: {fileID: 0}
     - target: {fileID: -927199367670048503, guid: 320b1c2af77554f99a1658df4a6d3d5c, type: 3}
       propertyPath: m_TagString
@@ -675,7 +675,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _movingSpeed: 7
   _turnSpeed: 8
-  _jumpPower: 7
+  _jumpSpeed: 7
   _isGroundedLength: 1
   _groundLayer:
     serializedVersion: 2
@@ -684,6 +684,7 @@ MonoBehaviour:
   _muzzle: {fileID: 1987237927}
   _bulletPrefab: {fileID: 1657851549703753509, guid: 3a7ba1cc9e6ac744a90dc2468c6201cd, type: 3}
   _jumpSfx: {fileID: 8300000, guid: 68fdb4ef289f33943b226e864a61ad70, type: 3}
+  _jumpCount: 0
 --- !u!136 &1222307363
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -726,8 +727,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7bf23c5960e2ec47bdaf9bf1c72de73, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _targetRange: 4
+  _targetRange: 10
   _detectInterval: 1
+--- !u!135 &1222307367
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1222307360}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.1
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1291793948
 GameObject:
   m_ObjectHideFlags: 0
@@ -2271,7 +2285,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1792981244}
-  m_LocalRotation: {x: 0.08279129, y: -0.000000030614068, z: 0.0000000025433096, w: 0.99656695}
+  m_LocalRotation: {x: 0.082791306, y: 1.1810774e-15, z: 7.158488e-17, w: 0.99656695}
   m_LocalPosition: {x: 0, y: 2.4, z: -5.2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -2387,7 +2401,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1848342357}
-  m_LocalRotation: {x: 0.08279129, y: -0.000000030614068, z: 0.0000000025433096, w: 0.99656695}
+  m_LocalRotation: {x: 0.082791306, y: 1.1810774e-15, z: 7.158488e-17, w: 0.99656695}
   m_LocalPosition: {x: 0, y: 2.4, z: -5.2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -2718,7 +2732,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1987237926}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.12, z: 0.48}
+  m_LocalPosition: {x: 0, y: 1.12, z: 0.874}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2731,7 +2745,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh22162
+  m_Name: pb_Mesh22914
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
