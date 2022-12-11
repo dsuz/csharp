@@ -16,15 +16,16 @@ public class Enclosure : MonoBehaviour
     [SerializeField] MeshFilter _meshFilter = default;
     /// <summary>囲まれた内側に色をつけるための Mesh</summary>
     Mesh _mesh = default;
+    /// <summary>線を描くための Line Renderer</summary>
     LineRenderer _line = default;
     /// <summary>囲まれた内側の当たり判定をとるためのコライダー</summary>
     PolygonCollider2D _polyCol = default;
-    //List<Vector3> _positionList = new List<Vector3>();
+    /// <summary>描いた曲線が閉じている場合は true とする</summary>
     bool _isLineClosed = false;
     /// <summary>線が交差していると判定された時、一番最後の線分と、最初から何番目の線分が交差しているかの値をここに入れる</summary>
     int _crossPoint = 0;
-    /// <summary>交点</summary>
-    Vector2? _crossPosition = null;
+    /// <summary>交点の座標</summary>
+    Vector2 _crossPosition;
     /// <summary>線を描いている間は true になる</summary>
     bool _isDrawing = false;
 
@@ -32,16 +33,16 @@ public class Enclosure : MonoBehaviour
     {
         _line = GetComponent<LineRenderer>();
         _polyCol = GetComponent<PolygonCollider2D>();
-        //StartDrawLine();
+        _line.positionCount = 0;    // 線を消す
     }
 
     void Update()
     {
-        if (Input.GetButtonDown("Fire1"))
+        if (Input.GetMouseButtonDown(0))
         {
             StartDrawLine();
         }
-        else if (Input.GetButtonUp("Fire1"))
+        else if (Input.GetMouseButtonUp(0))
         {
             FinishDrawLine();
         }
@@ -81,7 +82,7 @@ public class Enclosure : MonoBehaviour
             _line.SetPosition(_line.positionCount - 1, position);
         }
 
-        // 線が閉じているかどうか調べる
+        // 線が閉じているかどうか調べる。閉じていたら交点座標を計算する。
         if (IsLineClosed(ref _crossPosition))
         {
             _isLineClosed = true;
@@ -97,11 +98,12 @@ public class Enclosure : MonoBehaviour
     {
         _isDrawing = false;
         if (!_isLineClosed) return; // 線が閉じていない時は何もしない
+
         _polyCol.pathCount = _line.positionCount - _crossPoint;
         // 交差した線分以降の座標リスト、つまり閉じた線を構成する座標リストを抽出する
         var positions = new Vector3[_line.positionCount];
         _line.GetPositions(positions);
-        var closurePoints = positions.Skip(_crossPoint - 1).Take(positions.Length - _crossPoint - 1).ToArray();
+        var closurePoints = positions.Skip(_crossPoint - 1).Take(positions.Length - _crossPoint - 1).ToArray(); // 閉じた曲線を構成する座標リスト
         closurePoints[0] = (Vector3) _crossPosition;
         Paint(closurePoints);
         // Vector3[] を Vector2[] に変換しながら Polygon Collider の points に代入する
@@ -121,13 +123,15 @@ public class Enclosure : MonoBehaviour
     /// </summary>
     /// <param name="crossPosition">線が閉じている時、その座標を受け取る変数</param>
     /// <returns>線が閉じていたら true を返す。そうでない時は false を返す。</returns>
-    bool IsLineClosed(ref Vector2? crossPosition)
+    bool IsLineClosed(ref Vector2 crossPosition)
     {
-        if (_line.positionCount < 4) return false;
+        if (_line.positionCount < 4) return false;  // 4点以上ない場合は交差しない
 
+        // 座標 c, d は「Line を構成する最後と、その直前の座標」つまり最後の線分の両端となる
         Vector2 d = _line.GetPosition(_line.positionCount - 1);
         Vector2 c = _line.GetPosition(_line.positionCount - 2);
 
+        // これまでに作られた線分と交差しているかどうかを最初から順番に判定する
         for (int i = 0; i < _line.positionCount - 2; i++)
         {
             Vector2 a = _line.GetPosition(i);
@@ -139,29 +143,13 @@ public class Enclosure : MonoBehaviour
 
             if (s1.z * s2.z < 0 && s3.z * s4.z < 0)
             {
-                _crossPoint = i;
-                //m_crossPosition = GetCrossPosition(a, b, c, d);
-                crossPosition = a + (b - a) * s4.magnitude / (s3.magnitude + s4.magnitude);
+                _crossPoint = i;    // 「ここで交差した」という情報を保存する
+                crossPosition = a + (b - a) * s4.magnitude / (s3.magnitude + s4.magnitude); // 交点座標を計算する（https://imagingsolution.blog.fc2.com/blog-entry-137.html の公式を使った）
                 return true;
-            }
+            }   // 交差している場合（交差判定の解説は https://nekojara.city/unity-line-segment-cross がわかりやすい）
         }
 
         return false;
-    }
-
-    //Vector2 GetCrossPosition(Vector2 p1, Vector2 p2, Vector2 p3, Vector2 p4)
-    Vector2 GetCrossPosition(Vector2 a, Vector2 b, Vector2 c, Vector2 d)
-    {
-        //float det = (p1.x - p2.x) * (p4.y - p3.y) - (p4.x - p3.x) * (p1.y - p2.y);
-        //float t = ((p4.y - p3.y) * (p4.x - p2.x) + (p3.x - p4.x) * (p4.y - p2.y)) / det;
-        //float x = t * p1.x + (1f - t) * p2.x;
-        //float y = t * p1.y + (1f - t) * p2.y;
-        //return new Vector2(x, y);
-        float s1 = Vector3.Cross(d - c, a - c).magnitude;
-        float s2 = Vector3.Cross(d - c, b - c).magnitude;
-        //Vector2 crossPoint = a + (c - a) * s1 / (s1 + s2) + (d - a) * s1 / (s1 + s2);
-        Vector2 crossPoint = a + (b - a) * s1 / (s1 + s2);
-        return crossPoint;
     }
 
     /// <summary>
