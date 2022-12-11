@@ -237,10 +237,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 77f97e976e61945418b65c1415b56877, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _speed: 1
-  _stoppingDistance: 0.05
+  _speed: 3
+  _stoppingDistance: 0.01
   _target: {fileID: 1083134336}
-  _rotateSpeed: 4
+  _rotateSpeed: 10
 --- !u!212 &913797234
 SpriteRenderer:
   m_ObjectHideFlags: 0
