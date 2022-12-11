@@ -5,27 +5,31 @@ using UnityEngine;
 
 /// <summary>
 /// ドラッグで線をひき、線が閉じた時に内側にあるオブジェクト（コライダーが付いているもの）を破棄する。
+/// 線が一度交差したらそれ以上は線を描かない。
 /// </summary>
 [RequireComponent(typeof(LineRenderer), typeof(PolygonCollider2D))]
 public class Enclosure : MonoBehaviour
 {
     [Tooltip("負荷を下げるためのフレームスキップ数")]
-    [SerializeField, Range(0, 20)] int m_frameSkip = 15;
-    [SerializeField] MeshFilter m_meshFilter = default;
-    Mesh m_mesh = default;
-    LineRenderer m_line = default;
-    PolygonCollider2D m_polyCol = default;
-    List<Vector3> m_positionList = new List<Vector3>();
-    int m_frameSkipCounter = 0;
-    bool m_isLineClosed = false;
-    int m_crossPoint = 0;
+    [SerializeField, Range(0, 20)] int _frameSkip = 15;
+    /// <summary>囲まれた内側に色をつけるための Mesh Filter</summary>
+    [SerializeField] MeshFilter _meshFilter = default;
+    /// <summary>囲まれた内側に色をつけるための Mesh</summary>
+    Mesh _mesh = default;
+    LineRenderer _line = default;
+    /// <summary>囲まれた内側の当たり判定をとるためのコライダー</summary>
+    PolygonCollider2D _polyCol = default;
+    List<Vector3> _positionList = new List<Vector3>();
+    int _frameSkipCounter = 0;
+    bool _isLineClosed = false;
+    int _crossPoint = 0;
     /// <summary>交点</summary>
-    Vector2? m_crossPosition = null;
+    Vector2? _crossPosition = null;
 
     void Start()
     {
-        m_line = GetComponent<LineRenderer>();
-        m_polyCol = GetComponent<PolygonCollider2D>();
+        _line = GetComponent<LineRenderer>();
+        _polyCol = GetComponent<PolygonCollider2D>();
         StartDrawLine();
     }
 
@@ -33,16 +37,16 @@ public class Enclosure : MonoBehaviour
     {
         if (Input.GetButtonDown("Fire1"))
         {
-            m_frameSkipCounter = 0;
+            _frameSkipCounter = 0;
             StartDrawLine();
         }
         else if (Input.GetButton("Fire1"))
         {
-            m_frameSkipCounter++;
+            _frameSkipCounter++;
 
-            if (m_frameSkipCounter >= m_frameSkip)
+            if (_frameSkipCounter >= _frameSkip)
             {
-                m_frameSkipCounter = 0;
+                _frameSkipCounter = 0;
                 DrawLine();
             }
         }
@@ -57,11 +61,11 @@ public class Enclosure : MonoBehaviour
     /// </summary>
     void StartDrawLine()
     {
-        m_meshFilter.mesh = null;
-        m_positionList.Clear();
-        m_line.positionCount = m_positionList.Count;
-        m_line.SetPositions(m_positionList.ToArray());
-        m_isLineClosed = false;
+        _meshFilter.mesh = null;
+        _positionList.Clear();
+        _line.positionCount = _positionList.Count;
+        _line.SetPositions(_positionList.ToArray());
+        _isLineClosed = false;
     }
 
     /// <summary>
@@ -69,18 +73,18 @@ public class Enclosure : MonoBehaviour
     /// </summary>
     void DrawLine()
     {
-        if (m_isLineClosed) return; // 線が閉じていたらそれ以上は線をひかない。Polygon Collder 2D で処理できなくなるし、負荷が高い。
+        if (_isLineClosed) return; // 線が閉じていたらそれ以上は線を描かない。Polygon Collder 2D で処理できなくなるし、負荷が高い。
 
         Vector3 position = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         position.z = 0;
-        m_positionList.Add(position);
-        m_line.positionCount = m_positionList.Count;
-        m_line.SetPositions(m_positionList.ToArray());
+        _positionList.Add(position);
+        _line.positionCount = _positionList.Count;
+        _line.SetPositions(_positionList.ToArray());
 
         // 線が閉じているかどうか調べる
-        if (IsLineClosed(ref m_crossPosition))
+        if (IsLineClosed(ref _crossPosition))
         {
-            m_isLineClosed = true;
+            _isLineClosed = true;
         }
     }
 
@@ -91,19 +95,19 @@ public class Enclosure : MonoBehaviour
     /// </summary>
     void FinishDrawLine()
     {
-        if (!m_isLineClosed) return;
+        if (!_isLineClosed) return; // 線が閉じていない時は何もしない
 
-        m_polyCol.pathCount = m_positionList.Count - m_crossPoint;
+        _polyCol.pathCount = _positionList.Count - _crossPoint;
         // 交差した線分以降の座標リスト、つまり閉じた線を構成する座標リストを抽出する
-        var closurePoints = m_positionList.GetRange(m_crossPoint, m_positionList.Count - m_crossPoint - 1);
-        closurePoints[0] = (Vector3) m_crossPosition;
+        var closurePoints = _positionList.GetRange(_crossPoint, _positionList.Count - _crossPoint - 1);
+        closurePoints[0] = (Vector3) _crossPosition;
         Paint(closurePoints.ToArray());
         // Vector3[] を Vector2[] に変換しながら points に代入する
-        m_polyCol.points = Array.ConvertAll<Vector3, Vector2>(closurePoints.ToArray(), x => { return x; });
+        _polyCol.points = Array.ConvertAll<Vector3, Vector2>(closurePoints.ToArray(), x => { return x; });
         ContactFilter2D filter = new ContactFilter2D();
         List<Collider2D> results = new List<Collider2D>();
         
-        if (m_polyCol.OverlapCollider(filter, results) > 0)
+        if (_polyCol.OverlapCollider(filter, results) > 0)
         {
             // results の要素のうち、自分自身以外を破棄する
             results.ForEach(x =>
@@ -116,21 +120,21 @@ public class Enclosure : MonoBehaviour
 
     /// <summary>
     /// 最後に引いた線分が、それまでに引いた線分のうちどれかと交差しているかどうか調べる
-    /// https://www.google.com/search?q=%E7%B7%9A%E5%88%86+%E4%BA%A4%E5%B7%AE+%E5%88%A4%E5%AE%9A
+    /// https://www.google.com/search?q=%E7%B7%9A%E5%88%86+%E4%BA%A4%E5%B7%AE%E5%88%A4%E5%AE%9A+%E5%A4%96%E7%A9%8D
     /// </summary>
     /// <param name="crossPosition">線が閉じている時、その座標を受け取る変数</param>
     /// <returns>線が閉じていたら true を返す。そうでない時は false を返す。</returns>
     bool IsLineClosed(ref Vector2? crossPosition)
     {
-        if (m_line.positionCount < 4) return false;
+        if (_line.positionCount < 4) return false;
 
-        Vector2 d = m_line.GetPosition(m_line.positionCount - 1);
-        Vector2 c = m_line.GetPosition(m_line.positionCount - 2);
+        Vector2 d = _line.GetPosition(_line.positionCount - 1);
+        Vector2 c = _line.GetPosition(_line.positionCount - 2);
 
-        for (int i = 0; i < m_line.positionCount - 2; i++)
+        for (int i = 0; i < _line.positionCount - 2; i++)
         {
-            Vector2 a = m_line.GetPosition(i);
-            Vector2 b = m_line.GetPosition(i + 1);
+            Vector2 a = _line.GetPosition(i);
+            Vector2 b = _line.GetPosition(i + 1);
             Vector3 s1 = Vector3.Cross(b - a, c - a);
             Vector3 s2 = Vector3.Cross(b - a, d - a);
             Vector3 s3 = Vector3.Cross(d - c, b - c);
@@ -138,7 +142,7 @@ public class Enclosure : MonoBehaviour
 
             if (s1.z * s2.z < 0 && s3.z * s4.z < 0)
             {
-                m_crossPoint = i;
+                _crossPoint = i;
                 //m_crossPosition = GetCrossPosition(a, b, c, d);
                 crossPosition = a + (b - a) * s4.magnitude / (s3.magnitude + s4.magnitude);
                 return true;
@@ -169,9 +173,9 @@ public class Enclosure : MonoBehaviour
         //m_line.BakeMesh(m_mesh);
         //m_meshFilter.mesh = m_mesh;
 
-        m_mesh = new Mesh();
-        m_meshFilter.mesh = m_mesh;
-        m_mesh.SetVertices(vertices);
+        _mesh = new Mesh();
+        _meshFilter.mesh = _mesh;
+        _mesh.SetVertices(vertices);
         List<int> indices = new List<int>();
 
         for (int i = 1; i < vertices.Length - 1; i++)
@@ -181,8 +185,8 @@ public class Enclosure : MonoBehaviour
             indices.Add(i + 1);
         }
 
-        m_mesh.SetTriangles(indices, 0);
-        m_mesh.RecalculateBounds();
+        _mesh.SetTriangles(indices, 0);
+        _mesh.RecalculateBounds();
     }
 
     /// <summary>
@@ -192,9 +196,9 @@ public class Enclosure : MonoBehaviour
     void TriangulatePolygon(Vector3[] vertices)
     {
         // メッシュの頂点をセットする
-        m_mesh = new Mesh();
-        m_meshFilter.mesh = m_mesh;
-        m_mesh.SetVertices(vertices);
+        _mesh = new Mesh();
+        _meshFilter.mesh = _mesh;
+        _mesh.SetVertices(vertices);
 
         // これ以降で三角形を計算する
         List<int> indices = new List<int>();
