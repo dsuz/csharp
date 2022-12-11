@@ -385,7 +385,7 @@ LineRenderer:
     numCornerVertices: 0
     numCapVertices: 0
     alignment: 0
-    textureMode: 0
+    textureMode: 1
     shadowBias: 0.5
     generateLightingData: 0
   m_UseWorldSpace: 1
@@ -402,7 +402,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43fa773f8d62d6f429b2310d56f73e34, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _frameSkip: 1
+  _distanceBetweenPoints: 0.1
   _meshFilter: {fileID: 1874401853}
 --- !u!4 &1874401850
 Transform:

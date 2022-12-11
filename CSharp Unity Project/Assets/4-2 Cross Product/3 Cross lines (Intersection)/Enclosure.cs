@@ -10,8 +10,8 @@ using UnityEngine;
 [RequireComponent(typeof(LineRenderer), typeof(PolygonCollider2D))]
 public class Enclosure : MonoBehaviour
 {
-    [Tooltip("負荷を下げるためのフレームスキップ数")]
-    [SerializeField, Range(0, 20)] int _frameSkip = 15;
+    /// <summary>線を描く時に、各点をどれくらい離すか</summary>
+    [SerializeField] float _distanceBetweenPoints = 0.1f;
     /// <summary>囲まれた内側に色をつけるための Mesh Filter</summary>
     [SerializeField] MeshFilter _meshFilter = default;
     /// <summary>囲まれた内側に色をつけるための Mesh</summary>
@@ -19,40 +19,36 @@ public class Enclosure : MonoBehaviour
     LineRenderer _line = default;
     /// <summary>囲まれた内側の当たり判定をとるためのコライダー</summary>
     PolygonCollider2D _polyCol = default;
-    List<Vector3> _positionList = new List<Vector3>();
-    int _frameSkipCounter = 0;
+    //List<Vector3> _positionList = new List<Vector3>();
     bool _isLineClosed = false;
+    /// <summary>線が交差していると判定された時、一番最後の線分と、最初から何番目の線分が交差しているかの値をここに入れる</summary>
     int _crossPoint = 0;
     /// <summary>交点</summary>
     Vector2? _crossPosition = null;
+    /// <summary>線を描いている間は true になる</summary>
+    bool _isDrawing = false;
 
     void Start()
     {
         _line = GetComponent<LineRenderer>();
         _polyCol = GetComponent<PolygonCollider2D>();
-        StartDrawLine();
+        //StartDrawLine();
     }
 
     void Update()
     {
         if (Input.GetButtonDown("Fire1"))
         {
-            _frameSkipCounter = 0;
             StartDrawLine();
-        }
-        else if (Input.GetButton("Fire1"))
-        {
-            _frameSkipCounter++;
-
-            if (_frameSkipCounter >= _frameSkip)
-            {
-                _frameSkipCounter = 0;
-                DrawLine();
-            }
         }
         else if (Input.GetButtonUp("Fire1"))
         {
             FinishDrawLine();
+        }
+
+        if (_isDrawing)
+        {
+            DrawLine();
         }
     }
 
@@ -62,10 +58,9 @@ public class Enclosure : MonoBehaviour
     void StartDrawLine()
     {
         _meshFilter.mesh = null;
-        _positionList.Clear();
-        _line.positionCount = _positionList.Count;
-        _line.SetPositions(_positionList.ToArray());
+        _line.positionCount = 0;
         _isLineClosed = false;
+        _isDrawing = true;
     }
 
     /// <summary>
@@ -75,11 +70,16 @@ public class Enclosure : MonoBehaviour
     {
         if (_isLineClosed) return; // 線が閉じていたらそれ以上は線を描かない。Polygon Collder 2D で処理できなくなるし、負荷が高い。
 
+        // Line Renderer の positions に新たに追加する座標を計算する
         Vector3 position = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         position.z = 0;
-        _positionList.Add(position);
-        _line.positionCount = _positionList.Count;
-        _line.SetPositions(_positionList.ToArray());
+
+        // 最後に追加した Line Renderer の positions よりある程度離れていたら、その座標を Line Renderer に追加する
+        if (_line.positionCount == 0 || (Vector3.Distance(position, _line.GetPosition(_line.positionCount - 1)) > _distanceBetweenPoints))
+        {
+            _line.positionCount++;
+            _line.SetPosition(_line.positionCount - 1, position);
+        }
 
         // 線が閉じているかどうか調べる
         if (IsLineClosed(ref _crossPosition))
@@ -95,26 +95,23 @@ public class Enclosure : MonoBehaviour
     /// </summary>
     void FinishDrawLine()
     {
+        _isDrawing = false;
         if (!_isLineClosed) return; // 線が閉じていない時は何もしない
-
-        _polyCol.pathCount = _positionList.Count - _crossPoint;
+        _polyCol.pathCount = _line.positionCount - _crossPoint;
         // 交差した線分以降の座標リスト、つまり閉じた線を構成する座標リストを抽出する
-        var closurePoints = _positionList.GetRange(_crossPoint, _positionList.Count - _crossPoint - 1);
+        var positions = new Vector3[_line.positionCount];
+        _line.GetPositions(positions);
+        var closurePoints = positions.Skip(_crossPoint - 1).Take(positions.Length - _crossPoint - 1).ToArray();
         closurePoints[0] = (Vector3) _crossPosition;
-        Paint(closurePoints.ToArray());
-        // Vector3[] を Vector2[] に変換しながら points に代入する
-        _polyCol.points = Array.ConvertAll<Vector3, Vector2>(closurePoints.ToArray(), x => { return x; });
-        ContactFilter2D filter = new ContactFilter2D();
-        List<Collider2D> results = new List<Collider2D>();
+        Paint(closurePoints);
+        // Vector3[] を Vector2[] に変換しながら Polygon Collider の points に代入する
+        _polyCol.points = Array.ConvertAll<Vector3, Vector2>(closurePoints.ToArray(), x => x);
+        List<Collider2D> results = new List<Collider2D>();  // 囲まれた内側に入っているコライダーをこの変数に受け取る
         
-        if (_polyCol.OverlapCollider(filter, results) > 0)
+        // Polygon Collider と重なっているオブジェクトを破棄する
+        if (_polyCol.OverlapCollider(new ContactFilter2D(), results) > 0)
         {
-            // results の要素のうち、自分自身以外を破棄する
-            results.ForEach(x =>
-            {
-                if (!x.gameObject.Equals(this.gameObject))
-                    Destroy(x.gameObject);
-            });
+            results.ForEach(x => Destroy(x.gameObject));
         }
     }
 
@@ -167,12 +164,12 @@ public class Enclosure : MonoBehaviour
         return crossPoint;
     }
 
+    /// <summary>
+    /// 囲まれた内側の色を変えるために、座標のリストからメッシュを作る
+    /// </summary>
+    /// <param name="vertices">囲むための座標のリスト</param>
     void Paint(Vector3[] vertices)
     {
-        //m_mesh = new Mesh();
-        //m_line.BakeMesh(m_mesh);
-        //m_meshFilter.mesh = m_mesh;
-
         _mesh = new Mesh();
         _meshFilter.mesh = _mesh;
         _mesh.SetVertices(vertices);
@@ -187,70 +184,5 @@ public class Enclosure : MonoBehaviour
 
         _mesh.SetTriangles(indices, 0);
         _mesh.RecalculateBounds();
-    }
-
-    /// <summary>
-    /// Polygon triangulation (多角形の三角形分割)
-    /// </summary>
-    /// <param name="vertices"></param>
-    void TriangulatePolygon(Vector3[] vertices)
-    {
-        // メッシュの頂点をセットする
-        _mesh = new Mesh();
-        _meshFilter.mesh = _mesh;
-        _mesh.SetVertices(vertices);
-
-        // これ以降で三角形を計算する
-        List<int> indices = new List<int>();
-        var vList = vertices.ToList();
-
-        // 原点から一番遠い点を探す
-        var fareastVertex = vList.OrderByDescending(v => v.sqrMagnitude).FirstOrDefault();
-        int y = vList.IndexOf(fareastVertex);
-
-        {
-            // 「一番遠い点」とその両隣の頂点から成る三角形の外積ベクトルの方向を保存する
-            int x = (y - 1) % vList.Count;
-            int z = (y + 1) % vList.Count;
-            Vector3 v1 = vList[x] - vList[y];
-            Vector3 v2 = vList[y] - vList[z];
-            var crossDirection1 = Vector3.Cross(v1, v2).z;
-
-            // vList[x], vList[y], vList[z] から成る三角形の内部に他の頂点があるか調べる（内外判定）
-            bool hasOtherVertexInTriangle = false;
-
-            for (int i = 0; i < vList.Count; i++)
-            {
-                if (i == x || i == y || i == z) continue;
-
-                var c1 = Vector3.Cross(vList[x] - vList[z], vList[i] - vList[x]).z;
-                var c2 = Vector3.Cross(vList[z] - vList[y], vList[i] - vList[z]).z;
-                var c3 = Vector3.Cross(vList[y] - vList[x], vList[i] - vList[y]).z;
-
-                if ((c1 > 0 && c2 > 0 && c3 > 0) || (c1 < 0 && c2 < 0 && c3 < 0))
-                {
-                    hasOtherVertexInTriangle = true;
-                }
-            }
-
-            if (hasOtherVertexInTriangle)
-            {
-                y = (y + 1) % vList.Count;
-                x = (y - 1) % vList.Count;
-                z = (y + 1) % vList.Count;
-                v1 = vList[x] - vList[y];
-                v2 = vList[y] - vList[z];
-                var crossDirection2 = Vector3.Cross(v1, v2).z;
-
-                //if (crossDirection1 * crossDirection2 < 0)
-            }
-            else
-            {
-                indices.Add(x);
-                indices.Add(y);
-                indices.Add(z);
-                vList.RemoveAt(y);
-            }
-        }
     }
 }
