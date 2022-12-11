@@ -238,8 +238,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _speed: 3
-  _stoppingDistance: 0.01
   _target: {fileID: 1083134336}
+  _stoppingDistance: 0.01
   _rotateSpeed: 10
 --- !u!212 &913797234
 SpriteRenderer:
@@ -371,7 +371,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _line: {fileID: 1953449392}
   _distanceBetweenPoints: 0.1
-  _character: {fileID: 913797233}
+  _moveOnLine: {fileID: 913797233}
 --- !u!4 &1953449391
 Transform:
   m_ObjectHideFlags: 0
