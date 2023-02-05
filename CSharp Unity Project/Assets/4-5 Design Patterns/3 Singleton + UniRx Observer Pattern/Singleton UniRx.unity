@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -5886,7 +5886,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: "WS/\u2190\u2192 \u30AD\u30FC\u3067\u5DE6\u53F3\u306B\u52D5\u3051\u307E\u3059\nSpace
+  m_Text: "AD/\u2190\u2192 \u30AD\u30FC\u3067\u5DE6\u53F3\u306B\u52D5\u3051\u307E\u3059\nSpace
     \u30AD\u30FC\u3067\u30B8\u30E3\u30F3\u30D7\u3067\u304D\u307E\u3059\n\u30B3\u30A4\u30F3\u3092\u53D6\u308B\u3068\u5DE6\u4E0A\u306E\u30B3\u30A4\u30F3\u30AB\u30A6\u30F3\u30BF\u30FC\u304C\u5897\u3048\u307E\u3059\n\u30B3\u30A4\u30F3\u3092\uFF13\u3064\u53D6\u308B\u3068
     CLEAR \u3068\u8868\u793A\u3055\u308C\u307E\u3059"
 --- !u!222 &1790500216
